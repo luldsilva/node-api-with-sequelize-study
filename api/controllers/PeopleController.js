@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const database = require('../models')
 
 class PersonController {
@@ -142,6 +143,41 @@ class PersonController {
       const people = await database.Pessoas.findOne({ where: { id: Number(estudanteId) } })
       const registrations = await people.getAulasMatriculadas()
       return res.status(200).json(registrations);
+    } catch (error) {
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async getRegistrationPerClass(req, res) {
+    const { turmaId } = req.params;
+    try {
+      const allRegistrations = await database.Matriculas.findAndCountAll({
+        where: {
+          turma_id: Number(turmaId),
+          status: 'confirmado'
+        },
+        limit: 20,
+        order: [['estudante_id', 'ASC']]
+      })
+      return res.status(200).json(allRegistrations);
+    } catch (error) {
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async getRegistrationFullClass(req, res) {
+    const capacityClass = 2;
+    try {
+      const fullClass = await database.Matriculas
+        .findAndCountAll({
+          where: {
+            status: 'confirmado'
+          },
+          attributes: ['turma_id'],
+          group: ['turma_id'],
+          having: Sequelize.literal(`count(turma_id) > ${capacityClass}`)
+        })
+      return res.status(200).json(fullClass.count)
     } catch (error) {
       return res.status(500).json(error.message);
     }
