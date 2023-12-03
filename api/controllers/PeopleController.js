@@ -1,11 +1,13 @@
 const { Sequelize } = require('sequelize');
 const database = require('../models')
+const { PeopleServices } = require('../services')
+const peopleServices = new PeopleServices()
 
 class PersonController {
   static async getAllActivePeople(req, res) {
     try {
-      const allActivePeople = await database.Pessoas.findAll();
-      return res.status(200).json(allPeople);
+      const allActivePeople = await peopleServices.getActiveRecords()
+      return res.status(200).json(allActivePeople);
     } catch (error) {
       return res.status(500).json(error.message);
     }
@@ -13,8 +15,8 @@ class PersonController {
 
   static async getAllPeople(req, res) {
     try {
-      const allActivePeople = await database.Pessoas.scope('todos').findAll();
-      return res.status(200).json(allPeople);
+      const allActivePeople = await peopleServices.getAllRecords();
+      return res.status(200).json(allActivePeople);
     } catch (error) {
       return res.status(500).json(error.message);
     }
@@ -178,6 +180,16 @@ class PersonController {
           having: Sequelize.literal(`count(turma_id) > ${capacityClass}`)
         })
       return res.status(200).json(fullClass.count)
+    } catch (error) {
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async inactivatePeople(req, res) {
+    const { estudanteId } = req.params;
+    try {
+      await peopleServices.inactivatePeopleAndRegistration(Number(estudanteId));
+      return res.status(200).json({ message: `Matrículas ref. estudante ${estudanteId} canceladas.` })
     } catch (error) {
       return res.status(500).json(error.message);
     }

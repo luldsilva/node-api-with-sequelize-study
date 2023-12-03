@@ -3,8 +3,8 @@ const PeopleController = require('../controllers/PeopleController.js');
 
 const router = Router();
 
-router.get('/people', PeopleController.getAllActivePeople)
-router.get('/people/all', PeopleController.getAllPeople)
+router.get('/people', PeopleController.getAllPeople)
+router.get('/people/actives', PeopleController.getAllActivePeople)
 router.get('/people/:id', PeopleController.getPeople)
 router.get('/people/:estudanteId/matricula', PeopleController.getRegistration)
 router.get('/people/matricula/:turmaId/confirmadas', PeopleController.getRegistrationPerClass)
@@ -17,5 +17,6 @@ router.post('/people/:estudanteId/matricula', PeopleController.createRegistratio
 router.put('/people/:estudanteId/matricula/:matriculaId', PeopleController.putRegistration)
 router.delete('/people/:estudanteId/matricula/:matriculaId', PeopleController.deleteRegistration)
 router.post('/people/:id/restaura', PeopleController.restorePeople)
+router.post('/people/:estudanteId/inactivatePeople', PeopleController.inactivatePeople)
 
 module.exports = router
